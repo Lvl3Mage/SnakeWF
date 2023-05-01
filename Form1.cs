@@ -1,48 +1,22 @@
 namespace SnakeWF
 {
-    public enum Direccion
+    public enum Direction
     {
-        Arriba,
-        Abajo,
-        Derecha,
-        Izquierda
+        Up,
+        Down,
+        Left,
+        Right
     }
     public partial class Form1 : Form
     {
-        Keys arriba = Keys.Up;
-        Keys abajo = Keys.Down;
-        Keys derecha = Keys.Right;
-        Keys izquierda = Keys.Left;
 
-        int anchoEscenario = 735;
-        int alturaEscenario = 500;
+        int width = 735;
+        int height = 500;
 
-        int x;
-        int y;
 
-        Marcador marcador;
-        Serpiente serpiente;
-        Comida comida;
-        public Direccion DireccionActual { get; set; }
-
-        List<Giro> giros;
-
-        public Form1() // constructor del juego, inicializamos todo
+        public Form1() 
         {
-            InitializeComponent();
-            x = anchoEscenario / 2; // la mitad de la ventana
-            y = alturaEscenario / 2;
-            direccionActual = Direccion.Arriba;
-            this.Width = anchoEscenario;
-            this.Height = alturaEscenario;
-            this.BackColor = Color.LightGray;
-            serpiente = new Serpiente();
-            Controls.Add(Serpiente.MiPictureBox); // añadimos a una lista especial Controls todos los elementos visuales de la escena
-            comida = new Comida();
-            Controls.Add(comida.MiPictureBox);
-            marcador = new Marcador(…);
-            Controls.Add(marcador.MiLabel);
-            marcador.MiLabel.SendToBack();
+            // do later once the snake and segments have been written
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -50,94 +24,82 @@ namespace SnakeWF
 
         }
 
-        private void TeclaPulsada(object sender, KeyEventArgs e)
+        private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode)
-            {
-                case arriba:
-                    if (DireccionActual != Direccion.Arriba && DireccionActual != Direccion.Abajo) // basicamente si estamos yendo para una direccion, no podemos volver a ir para la misma o la contraria
-                    {
-                        DireccionActual = Direccion.Arriba;
-                        giros.Add(new Giro())
-                    }
-                    break;
-                case abajo:
-                    if (DireccionActual != Direccion.Arriba && DireccionActual != Direccion.Abajo)
-                    {
-                        DireccionActual = Direccion.Abajo;
-                    }
-                    break;
-                case derecha:
-                    if (DireccionActual != Direccion.Derecha && DireccionActual != Direccion.Izquierda)
-                    {
-                        DireccionActual = Direccion.Derecha;
-                    }
-                    break;
-                case izquierda:
-                    if (DireccionActual != Direccion.Derecha && DireccionActual != Direccion.Izquierda)
-                    {
-                        DireccionActual = Direccion.Izquierda;
-                    }
-                    break;
-                default:
-                    return;
-            }
+            //Handle key presses and change the direction
         }
     }
 
-    public class Serpiente // modificar
+    public class Snake 
     {
-        Segmento cabeza = new Segmento((0, 0));
+        Segment head;
+        // list of turns
+        // list of segments
+
+        // public move method that accepts the delta time since last frame 
+            //moves the snake in its direction (updates each segment with each turn and removes the last segment and turn if the segment is of size 0)
+        
+        //Rotate snake method
+            //rotates the snake, creating a new segment and a new turn
+
+            // potential pitfall - head colliding with one of the segments behind it
+
+        //isAlive
+            //Checks if snake head collides with any of the walls/segments
     }
 
-    public class Segmento // modificar
+    public class Segment
     {
-        PictureBox segmentoCola;
-        (int, int) posicionCola;
-        Color colorSegmento;
-        int tamañoSegmento;
-         
-        public Segmento ((int,int) posicionCola)
+        PictureBox visual;
+        (int, int) startPoint;
+        (int, int) endPoint;
+        Color color;
+        Form attachedForm;
+        public Segment ((int,int) _startPoint, (int,int) _endPoint, Form form)
         {
-            this.posicionCola = posicionCola;
-            this.tamañoSegmento = 
+            //create the visual and add it to form controls
+            attachedForm = form;
+            startPoint = _startPoint;
+            endPoint = _endPoint;
+            //call the update method
+        }
+        // update segment method that redraws the visual with new dimentions (from start point to end point)
+        
+        // remove segment method that removes the segment from the form controls
+    }
+
+    public class Turn 
+    {
+        (int, int) position;
+        Direction direction;
+
+        public Turn((int, int) pos, Direction dir)
+        {
+            position = pos;
+            direction = dir;
         }
     }
 
-    public class Giro // hay que modificar, pero está medio bien
+    public class Food
     {
-        (int, int) posicionGiro;
-        Direccion direccionGiro;
-
-        public Giro ((int, int) posicionGiro, Direccion direccionGiro)
-        {
-            this.posicionGiro = posicionGiro;
-            this.direccionGiro = direccionGiro;
-        }
+        // has position, color and point count
+        // has an attached PictureBox
     }
 
-    public class Comida
+    /*public class Marker
     {
+        Label label;
 
-    }
-
-    public class Marcador
-    {
-        Public int Puntos { get; set; };
-        double segundosVida;
-
-        public Marcador()
+        public Marker(Form1 window, (int,int) pos)
         {
-            this.puntos = 0;
-            this.segundosVida = 10;
+            label = new Label();
+            window.Controls.Add(label);
+            label.Location = new Point(pos.Item1, pos.Item2);
         }
 
-        public void SumarPuntos(Comida comida) // segun el tipo de comida, habrá que añadir una cantidad determinada de puntos
+        public void UpdateMarker(int points, int lifetime) // segun el tipo de comida, habrá que añadir una cantidad determinada de puntos
         {
-            switch (comida)
-            {
-                case 
-            }
+            label.Text = $"{points}, {lifetime}";
         }
-    }
+    }*/
 }
