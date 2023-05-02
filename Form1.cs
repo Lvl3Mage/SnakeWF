@@ -7,7 +7,7 @@ namespace SnakeWF
         Left,
         Right
     }
-    public partial class Form1 : Form
+    public partial class Form1 : Form // handle this class after the base ones have been written
     {
 
         int width = 735;
@@ -26,7 +26,7 @@ namespace SnakeWF
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            //Handle key presses and change the direction
+            //Handle key presses and change the direction of the snake
         }
     }
 
@@ -36,37 +36,44 @@ namespace SnakeWF
         // list of turns
         // list of segments
 
+        //May need additional data such as:
+            //The total snake length (in order to facilitate the snake update and point increment)
+
+
         // public move method that accepts the delta time since last frame 
             //moves the snake in its direction (updates each segment with each turn and removes the last segment and turn if the segment is of size 0)
         
         //Rotate snake method
             //rotates the snake, creating a new segment and a new turn
 
-            // potential pitfall - head colliding with one of the segments behind it
+            
 
-        //isAlive
-            //Checks if snake head collides with any of the walls/segments
+        //checkInCollision
+            //Checks if snake head collides with any of the segments
+
+            // potential pitfall - head colliding with one of the segments behind it
     }
 
-    public class Segment
+    public class Segment // think about whether the head should actually inherit from the segment class (it doesn't actually have that many similarities with it)
     {
+        //Look into whether the intersections will be handled here or in the snake class
         PictureBox visual;
         (int, int) startPoint;
-        (int, int) endPoint;
+        int length;
+        Direction direction;
         Color color;
         Form attachedForm;
-        public Segment ((int,int) _startPoint, (int,int) _endPoint, Form form)
+        public Segment ((int,int) _startPoint, Form form)
         {
             //create the visual and add it to form controls
             attachedForm = form;
             startPoint = _startPoint;
-            endPoint = _endPoint;
             //call the update method
         }
-        // update segment method that redraws the visual with new dimentions (from start point to end point)
+        // update segment method that redraws the visual with new dimentions (from start point in the direction and with specified length)
         
         // remove segment method that removes the segment from the form controls
-    }
+    }   
 
     public class Turn 
     {
