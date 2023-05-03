@@ -33,13 +33,22 @@ namespace SnakeWF
     public class Snake 
     {
         Segment head;
-        // list of turns
-        // list of segments
+        List<Segment> segments = new List<Segment> ();
+        List<Turn> turns = new List<Turn> ();
+        int pixelsPerSecond = 100;
 
         //May need additional data such as:
             //The total snake length (in order to facilitate the snake update and point increment)
 
+        public void Move(float deltaTime)
+        {
+            int delta = (int)(pixelsPerSecond * deltaTime);
+            //moves the head segment in its direction
 
+            //updates the last segment to move to head with new length
+
+            //updates the first segment and removes it if length 0
+        }
         // public move method that accepts the delta time since last frame 
             //moves the snake in its direction (updates each segment with each turn and removes the last segment and turn if the segment is of size 0)
         
