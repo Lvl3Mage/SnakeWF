@@ -43,6 +43,17 @@ namespace SnakeWF
         public void Move(float deltaTime)
         {
             int delta = (int)(pixelsPerSecond * deltaTime);
+            switch (head.direction)
+            {
+                case Direction.Up:
+                    break;
+                case Direction.Down:
+                    break;
+                case Direction.Left:
+                    break;
+                case Direction.Right:
+                    break;
+            }
             //moves the head segment in its direction
 
             //updates the last segment to move to head with new length
