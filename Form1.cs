@@ -33,38 +33,73 @@ namespace SnakeWF
     public class Snake 
     {
         Segment head;
-        List<Segment> segments = new List<Segment> ();
-        List<Turn> turns = new List<Turn> ();
+        List<Segment> segments = new List<Segment>();
         int pixelsPerSecond = 100;
+        int snakeWidth = 50;
 
         //May need additional data such as:
             //The total snake length (in order to facilitate the snake update and point increment)
+        
+        public Snake((int,int) position)
+        {
+            //create the head
 
+            //create the first segment
+        }
         public void Move(float deltaTime)
         {
+
+            //calculates the movement distance and movement vector
             int delta = (int)(pixelsPerSecond * deltaTime);
+            (int, int) movementVector = (0,0);
             switch (head.direction)
             {
                 case Direction.Up:
+                    movementVector = (0, delta);
                     break;
                 case Direction.Down:
+                    movementVector = (0, -delta);
                     break;
                 case Direction.Left:
+                    movementVector = (-delta, 0);
                     break;
                 case Direction.Right:
+                    movementVector = (delta, 0);
                     break;
             }
+            
             //moves the head segment in its direction
+            (int, int) newHeadPos = head.position;
+            newHeadPos = (newHeadPos.Item1 + movementVector.Item1, newHeadPos.Item2 + movementVector.Item2);
+           
+            head.UpdateSegment(newHeadPos, snakeWidth, snakeWidth, head.direction);
+
 
             //updates the last segment to move to head with new length
+            Segment closestSegment = segments[segments.Count-1];
 
-            //updates the first segment and removes it if length 0
+            (int, int) newClosestSegPos = closestSegment.position;
+            newClosestSegPos = (newClosestSegPos.Item1 + movementVector.Item1, newClosestSegPos.Item2 + movementVector.Item2);
+
+            closestSegment.UpdateSegment(newClosestSegPos, closestSegment.length + delta, snakeWidth, closestSegment.direction);
+
+
+            //updates the first segment and removes it if length 0 and not last segment
+
+            Segment lastSegment = segments[0];
+            lastSegment.UpdateSegment(lastSegment.position, lastSegment.length - delta, snakeWidth, lastSegment.direction);
+            if(segments.Count > 1 && lastSegment.length <= 0) {
+                segments.RemoveAt(0);
+            }
         }
-        // public move method that accepts the delta time since last frame 
-            //moves the snake in its direction (updates each segment with each turn and removes the last segment and turn if the segment is of size 0)
-        
-        //Rotate snake method
-            //rotates the snake, creating a new segment and a new turn
+        public void RotateSnake(Direction direction)//rotates the snake, creating a new segment
+        {
+            //move head to new position and change direction
+            //update previous segment to the previous head position
+            //decrease the length of the last segment by the head movement
+            // add new segment next to head with length 0
+        }
+            
 
             
 
@@ -131,17 +166,16 @@ namespace SnakeWF
         // remove segment method that removes the segment from the form controls
     }   
 
-    public class Turn 
-    {
-        (int, int) position;
-        Direction direction;
 
-        public Turn((int, int) pos, Direction dir)
-        {
-            position = pos;
-            direction = dir;
-        }
-    }
+
+
+
+
+
+
+
+
+
 
     public class FoodManager
     {
