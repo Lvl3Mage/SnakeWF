@@ -54,21 +54,51 @@ namespace SnakeWF
             // potential pitfall - head colliding with one of the segments behind it
     }
 
-    public class Segment // think about whether the head should actually inherit from the segment class (it doesn't actually have that many similarities with it)
+    public class Segment// think about whether the head should actually inherit from the segment class (it doesn't actually have that many similarities with it)
     {
+        public Direction direction { get; private set; }
         //Look into whether the intersections will be handled here or in the snake class
         PictureBox visual;
-        (int, int) startPoint;
-        int length;
-        Direction direction;
         Color color;
         Form attachedForm;
-        public Segment ((int,int) _startPoint, Form form)
+        public Segment (Form form)
         {
             //create the visual and add it to form controls
             attachedForm = form;
-            startPoint = _startPoint;
             //call the update method
+        }
+
+        public void UpdateSegment ((int, int) startPoint, int length, int width, Direction direction)
+        {
+            this.direction = direction;
+            int xAux;
+            int yAux;
+
+            switch (direction)
+            {
+                case Direction.Up:
+                    xAux = startPoint.Item1 - width / 2;
+                    yAux = startPoint.Item2;
+                    visual.Location = new Point(xAux, yAux);
+                    break;
+                case Direction.Down:
+                    xAux = startPoint.Item1 - width / 2;
+                    yAux = visual.Location.Y - length;
+                    startPoint = new Point(xAux, yAux);
+                    break;
+                case Direction.Left:
+                    xAux = visual.Location.X;
+                    yAux = visual.Location.Y - length / 2;
+                    startPoint = new Point(xAux, yAux);
+                    break;
+                case Direction.Right:
+                    xAux = visual.Location.X - width;
+                    yAux = visual.Location.Y - length / 2;
+                    startPoint = new Point(xAux, yAux);
+                    break;
+                default:
+                    break;
+            }
         }
         // update segment method that redraws the visual with new dimentions (from start point in the direction and with specified length)
         
@@ -87,10 +117,13 @@ namespace SnakeWF
         }
     }
 
+    public class FoodManager
+    {
+        
+    }
     public class Food
     {
-        // has position, color and point count
-        // has an attached PictureBox
+
     }
 
     /*public class Marker
