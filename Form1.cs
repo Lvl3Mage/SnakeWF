@@ -57,6 +57,8 @@ namespace SnakeWF
     public class Segment// think about whether the head should actually inherit from the segment class (it doesn't actually have that many similarities with it)
     {
         public Direction direction { get; private set; }
+        public int length { get; private set; }
+        public (int, int) position { get; private set; }
         //Look into whether the intersections will be handled here or in the snake class
         PictureBox visual;
         Color color;
@@ -71,30 +73,34 @@ namespace SnakeWF
         public void UpdateSegment ((int, int) startPoint, int length, int width, Direction direction)
         {
             this.direction = direction;
+            this.length = length;
+            this.position = startPoint;
             int xAux;
             int yAux;
+            int segmentX = startPoint.Item1;
+            int segmentY = startPoint.Item2;
 
             switch (direction)
             {
                 case Direction.Up:
-                    xAux = startPoint.Item1 - width / 2;
-                    yAux = startPoint.Item2;
+                    xAux = segmentX - width / 2;
+                    yAux = segmentY;
                     visual.Location = new Point(xAux, yAux);
                     break;
                 case Direction.Down:
-                    xAux = startPoint.Item1 - width / 2;
-                    yAux = visual.Location.Y - length;
-                    startPoint = new Point(xAux, yAux);
+                    xAux = segmentX - width / 2;
+                    yAux = segmentY - length;
+                    visual.Location = new Point(xAux, yAux);
                     break;
                 case Direction.Left:
-                    xAux = visual.Location.X;
-                    yAux = visual.Location.Y - length / 2;
-                    startPoint = new Point(xAux, yAux);
+                    xAux = segmentX;
+                    yAux = segmentY - length / 2;
+                    visual.Location = new Point(xAux, yAux);
                     break;
                 case Direction.Right:
-                    xAux = visual.Location.X - width;
-                    yAux = visual.Location.Y - length / 2;
-                    startPoint = new Point(xAux, yAux);
+                    xAux = segmentX - width;
+                    yAux = segmentY - length / 2;
+                    visual.Location = new Point(xAux, yAux);
                     break;
                 default:
                     break;
