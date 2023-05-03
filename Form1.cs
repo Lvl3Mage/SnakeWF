@@ -16,6 +16,8 @@ namespace SnakeWF
 
         public Form1() 
         {
+            InitializeComponent();
+            Segment segment = new Segment(this, (50, 50), 100, 50, Direction.Down, Color.Blue);
             // do later once the snake and segments have been written
         }
 
@@ -69,16 +71,20 @@ namespace SnakeWF
         public int length { get; private set; }
         public (int, int) position { get; private set; }
         //Look into whether the intersections will be handled here or in the snake class
-        PictureBox visual;
+        PictureBox visual { get; private set; }
         Color color;
         Form attachedForm;
-        public Segment (Form form)
+        public Segment (Form form, (int, int) startPoint, int length, int width, Direction direction, Color color)
         {
             //create the visual and add it to form controls
+            visual = new PictureBox ();
+            visual.BackColor = color;
             attachedForm = form;
-            //call the update method
+            attachedForm.Controls.Add (visual);
+            UpdateSegment(startPoint, length, width, direction);
         }
 
+        // update segment method that redraws the visual with new dimentions (from start point in the direction and with specified length)
         public void UpdateSegment ((int, int) startPoint, int length, int width, Direction direction)
         {
             this.direction = direction;
@@ -95,29 +101,42 @@ namespace SnakeWF
                     xAux = segmentX - width / 2;
                     yAux = segmentY;
                     visual.Location = new Point(xAux, yAux);
+                    visual.Size = new Size(width, length);
                     break;
                 case Direction.Down:
                     xAux = segmentX - width / 2;
                     yAux = segmentY - length;
                     visual.Location = new Point(xAux, yAux);
+                    visual.Size = new Size(width, length);
                     break;
                 case Direction.Left:
                     xAux = segmentX;
-                    yAux = segmentY - length / 2;
+                    yAux = segmentY - width / 2;
                     visual.Location = new Point(xAux, yAux);
+                    visual.Size = new Size(length, width);
                     break;
                 case Direction.Right:
-                    xAux = segmentX - width;
-                    yAux = segmentY - length / 2;
+                    xAux = segmentX - length;
+                    yAux = segmentY - width / 2;
                     visual.Location = new Point(xAux, yAux);
+                    visual.Size = new Size(length, width);
                     break;
                 default:
                     break;
             }
         }
-        // update segment method that redraws the visual with new dimentions (from start point in the direction and with specified length)
         
         // remove segment method that removes the segment from the form controls
+
+        public void RemoveSegment ()
+        {
+            attachedForm.Controls.Remove(visual);
+        }
+        
+        public bool isSegmentCollisioningWith (Rectangle bounds)
+        {
+            return visual.Bounds.IntersectsWith(bounds);
+        }
     }   
 
     public class Turn 
@@ -134,11 +153,11 @@ namespace SnakeWF
 
     public class FoodManager
     {
-        
+        //get visuals and look for collitions, random timing, send bool to snake
     }
     public class Food
     {
-
+        //create the visuals
     }
 
     /*public class Marker
