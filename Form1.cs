@@ -31,7 +31,23 @@ namespace SnakeWF
             //Handle key presses and change the direction of the snake
         }
     }
-
+    public class IntVec
+    {
+        public int x, y;
+        public IntVec(int _x, int _y)
+        {
+            x = _x;
+            y = _y;
+        }
+        public static IntVec operator -(IntVec other)
+        {
+            return new IntVec(-other.x, -other.y);
+        }
+        public static IntVec operator +(IntVec self, IntVec other)
+        {
+            return new IntVec(self.x+other.x, other.y+other.y);
+        }
+    }
     public class Snake 
     {
         Segment head;
@@ -96,10 +112,24 @@ namespace SnakeWF
         }
         public void RotateSnake(Direction direction)//rotates the snake, creating a new segment
         {
-            //move head to new position and change direction
-            //update previous segment to the previous head position
+            //rotatehead
             //decrease the length of the last segment by the head movement
-            // add new segment next to head with length 0
+            //add new segment next to head with length 0
+        }
+        (int, int) GetNormalVectorFromDir(Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.Up:
+                    return (0, 1);
+                case Direction.Down:
+                    return (0, -1);
+                case Direction.Left:
+                    return (0, -1);
+                case Direction.Right:
+                    return (0, 1);
+                default: return (0, 0);
+            }
         }
             
 
