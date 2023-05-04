@@ -29,7 +29,10 @@ namespace SnakeWF
             while (true)
             {
                 snake.Move(0.05f);
-
+                if (snake.checkInCollision())
+                {
+                    break;
+                }
                 await Task.Delay(1);
 
             }
@@ -120,6 +123,7 @@ namespace SnakeWF
         int pixelsPerSecond = 100;
         int snakeWidth = 30;
         Form attachedForm;
+        int accumulatedLength = 1000;
 
         //May need additional data such as:
             //The total snake length (in order to facilitate the snake update and point increment)
@@ -132,25 +136,23 @@ namespace SnakeWF
 
             IntVec newSegmentPos = new IntVec(head.position) - GetNormalVectorFromDir(head.direction) * snakeWidth;
 
-
             //add new segment next to head with length 0
-            segments.Add(new Segment(attachedForm, newSegmentPos.ToTuple(), 1000, snakeWidth, head.direction, Color.Green));
-            //create the first segment
-            //AddSegmentAtHead();
+            segments.Add(new Segment(attachedForm, newSegmentPos.ToTuple(), 0, snakeWidth, head.direction, Color.Green));
+        }
+        public void AddToLength(int val)
+        {
+            accumulatedLength += val;
         }
         public void Move(float deltaTime)
         {
             //calculates the movement distance and movement vector
             int delta = (int)(pixelsPerSecond * deltaTime);
-            
             IntVec movementVector = GetNormalVectorFromDir(head.direction)*delta;
 
             //moves the head segment in its direction
-
             IntVec newHeadPos = new IntVec(head.position) + movementVector;
-            //Debug.WriteLine($"pos: {head.position} new vec {movementVector.ToTuple()}, sum {(new IntVec(head.position) + movementVector).y} ");
             head.UpdateSegment(newHeadPos.ToTuple(), snakeWidth, snakeWidth, head.direction);
-            //Debug.WriteLine(head.position);
+
 
             //updates the last segment to move to head with new length
             Segment closestSegment = segments[segments.Count-1];
@@ -160,18 +162,22 @@ namespace SnakeWF
             closestSegment.UpdateSegment(newClosestSegPos.ToTuple(), closestSegment.length + delta, snakeWidth, closestSegment.direction);
 
 
-            //updates the first segment and removes it if length 0 and not last segment
-            int leftoverLength = delta;
+            //sets the leftoverLength accounting for the accumulated length
+            int leftoverLength = Math.Max(delta-accumulatedLength, 0);
 
+            accumulatedLength = Math.Max(accumulatedLength - delta, 0);
+            
             
 
+
+            //subtracts from the last segment using leftover length (removing the segment if it hits 0 length) until the leftover length runs out
             while (leftoverLength > 0) {
                 if (segments[0].length > leftoverLength)
                 {
                     segments[0].UpdateSegment(segments[0].position, segments[0].length - leftoverLength, snakeWidth, segments[0].direction);
                     break;
                 }
-                else
+                else // segment is shorter than leftover length
                 {
                     int removedLength = segments[0].length;
                     if(segments.Count > 1)
@@ -179,7 +185,7 @@ namespace SnakeWF
                         segments[0].RemoveSegment();
                         segments.RemoveAt(0);
                     }
-                    else
+                    else// in the case of there beign only one segment left the segment is not removed
                     {
                         segments[0].UpdateSegment(segments[0].position, segments[0].length - leftoverLength, snakeWidth, segments[0].direction);
                         break;
@@ -198,35 +204,24 @@ namespace SnakeWF
             {
                 return;
             }
-            IntVec centerPos = new IntVec(head.position) - (GetNormalVectorFromDir(head.direction)*snakeWidth)/2;
+
             //rotate head
+            //find the center position of the head
+            IntVec centerPos = new IntVec(head.position) - (GetNormalVectorFromDir(head.direction)*snakeWidth)/2;
+            //update the head with the new offset in the new direction
             head.UpdateSegment((centerPos + (GetNormalVectorFromDir(direction) * snakeWidth)/2).ToTuple(), head.length, snakeWidth, direction);
             AddSegmentAtHead();
         }
 
         void AddSegmentAtHead()
         {
-            IntVec newSegmentPos = new IntVec(head.position) - GetNormalVectorFromDir(head.direction) * snakeWidth;
 
+
+            IntVec newSegmentPos = new IntVec(head.position) - GetNormalVectorFromDir(head.direction) * snakeWidth;
 
             //add new segment next to head with length 0
             segments.Add(new Segment(attachedForm, newSegmentPos.ToTuple(), 0, snakeWidth, head.direction, Color.Green));
         }
-        /*Direction GetOppositeDir(Direction dir)
-        {
-            switch (dir)
-            {
-                case Direction.Up:
-                    return Direction.Down;
-                case Direction.Down:
-                    return Direction.Up;
-                case Direction.Left:
-                    return Direction.Right;
-                case Direction.Right:
-                    return Direction.Left;
-                default: return Direction.Up;
-            }
-        }*/
         IntVec GetNormalVectorFromDir(Direction dir)//returns the direction represented as an IntVec
         {
             switch (dir)
@@ -245,11 +240,18 @@ namespace SnakeWF
             
 
             
-
-        //checkInCollision
-            //Checks if snake head collides with any of the segments
-
-            // potential pitfall - head colliding with one of the segments behind it
+        public bool checkInCollision()
+        {
+            foreach (Segment segment in segments)
+            {
+                if (segment.isSegmentCollisioningWith(head.visual.Bounds)) { return true; }
+            }
+            return false;
+        }
+        public bool checkHeadCollision(Rectangle Bounds)
+        {
+            return head.isSegmentCollisioningWith(Bounds);
+        }
     }
 
     public class Segment// think about whether the head should actually inherit from the segment class (it doesn't actually have that many similarities with it)
@@ -323,7 +325,7 @@ namespace SnakeWF
         {
             return visual.Bounds.IntersectsWith(bounds);
         }
-    }   
+    }
 
 
 
@@ -338,11 +340,59 @@ namespace SnakeWF
 
     public class FoodManager
     {
-        //get visuals and look for collitions, random timing, send bool to snake
+        List<Food> foodObjs = new List<Food>();
+        Snake snake;
+        Form attachedForm;
+        int desiredFoodAmount = 4;
+        (int, int) screenBounds;
+        public FoodManager(Snake _snake, Form _attachedForm, (int,int) _screenBounds)
+        {
+            snake = _snake;
+            attachedForm = _attachedForm;
+            screenBounds = _screenBounds;
+        }
+        public void Update(float deltaTime)
+        {
+            //Update all foodObjs 
+                // if lifetime of foodObj is 0 or below remove it (remove from list and call remove method)
+                // check collision with snake head (if colliding remove food and add the points to snake) (use snake.checkHeadCollision)
+
+
+            //Add random food until desiredAmount is reached
+        }
+
+        //Maybe add some method to add random food to make it more readable
+            //(as far as I see it we shouldn't really care if the food spawns inside the snake, it won't happen often enough)
+             
+            
     }
-    public class Food
+    public class Food //This class should be mostly set up but feel free to change it if you need to
     {
-        //create the visuals
+
+        public int points { get; private set; }
+        public float lifetime { get; private set; } 
+        public PictureBox visual { get; private set; }
+        Form attachedForm;
+        public Food((int,int) _position, int _points, float _lifetime, Color color, Form _attachedForm)
+        {
+            attachedForm = _attachedForm;
+            points = _points;
+            lifetime = _lifetime;
+            
+            visual = new PictureBox();
+            visual.Location = new Point(_position.Item1, _position.Item2);
+            visual.BackColor = color;
+            visual.Size = new Size(15, 15);
+            attachedForm.Controls.Add(visual);
+        }
+        public void Update(float deltaTime)
+        {
+            lifetime -= deltaTime;
+        }
+        public void Remove()
+        {
+            attachedForm.Controls.Remove(visual);
+        }
     }
 
     /*public class Marker
