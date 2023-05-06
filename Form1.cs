@@ -124,6 +124,8 @@ namespace SnakeWF
         int snakeWidth = 30;
         Form attachedForm;
         int accumulatedLength = 1000;
+        int points = 0;
+        int lifetime = 0;
 
         //May need additional data such as:
             //The total snake length (in order to facilitate the snake update and point increment)
@@ -325,15 +327,11 @@ namespace SnakeWF
         {
             return visual.Bounds.IntersectsWith(bounds);
         }
+        public void Draw()
+        {
+            visual.Refresh();
+        }
     }
-
-
-
-
-
-
-
-
 
 
 
@@ -353,12 +351,10 @@ namespace SnakeWF
         }
         public void Update(float deltaTime)
         {
-            //Update all foodObjs 
-                // if lifetime of foodObj is 0 or below remove it (remove from list and call remove method)
+            //if no food objects
+                //add a random amount of food objets
+            //for all food objs
                 // check collision with snake head (if colliding remove food and add the points to snake) (use snake.checkHeadCollision)
-
-
-            //Add random food until desiredAmount is reached
         }
 
         //Maybe add some method to add random food to make it more readable
@@ -370,10 +366,10 @@ namespace SnakeWF
     {
 
         public int points { get; private set; }
-        public float lifetime { get; private set; } 
+        public int lifetime { get; private set; } 
         public PictureBox visual { get; private set; }
         Form attachedForm;
-        public Food((int,int) _position, int _points, float _lifetime, Color color, Form _attachedForm)
+        public Food((int,int) _position, int _points, int _lifetime, Color color, Form _attachedForm)
         {
             attachedForm = _attachedForm;
             points = _points;
@@ -385,13 +381,13 @@ namespace SnakeWF
             visual.Size = new Size(15, 15);
             attachedForm.Controls.Add(visual);
         }
-        public void Update(float deltaTime)
-        {
-            lifetime -= deltaTime;
-        }
         public void Remove()
         {
             attachedForm.Controls.Remove(visual);
+        }
+        public void Draw()
+        {
+            visual.Refresh();
         }
     }
 
