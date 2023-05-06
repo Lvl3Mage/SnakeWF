@@ -355,12 +355,15 @@ namespace SnakeWF
         Form attachedForm;
         int desiredFoodAmount = 4;
         (int, int) screenBounds;
-        public FoodManager(Snake _snake, Form _attachedForm, (int, int) _screenBounds)
+        Random r;
+        Marker marker;
+        public FoodManager(Snake _snake, Form _attachedForm, (int, int) _screenBounds, Marker _marker)
         {
+            marker = _marker;
+            r = new Random();
             snake = _snake;
             attachedForm = _attachedForm;
             screenBounds = _screenBounds;
-            Random r = new Random();
         }
         public void Update(float deltaTime)
         {
