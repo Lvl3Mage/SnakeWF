@@ -69,7 +69,9 @@ namespace SnakeWF
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-
+            snake.Move(0.1f);
+            snake.Draw();
+            Invalidate();
         }
     }
     public class IntVec
@@ -130,8 +132,6 @@ namespace SnakeWF
         int snakeWidth = 30;
         Form attachedForm;
         int accumulatedLength = 1000;
-        int points = 0;
-        int lifetime = 0;
 
         //May need additional data such as:
         //The total snake length (in order to facilitate the snake update and point increment)
@@ -246,7 +246,12 @@ namespace SnakeWF
                 default: return new IntVec(0, 0);
             }
         }
-
+        public void Draw()
+        {
+            foreach(Segment segment in segments) {
+                segment.Draw();
+            }
+        }
 
 
         public bool checkInCollision()
@@ -398,20 +403,24 @@ namespace SnakeWF
         }
     }
 
-    /*public class Marker
+    public class Marker
     {
         Label label;
-
-        public Marker(Form1 window, (int,int) pos)
+        public int points, lifetime = 10;
+        public Marker(Form1 window, (int, int) pos)
         {
             label = new Label();
             window.Controls.Add(label);
             label.Location = new Point(pos.Item1, pos.Item2);
+            Update();
         }
-
-        public void UpdateMarker(int points, int lifetime) // segun el tipo de comida, habrá que añadir una cantidad determinada de puntos
+        public void Draw()
         {
-            label.Text = $"{points}, {lifetime}";
+            label.Refresh();
         }
-    }*/
+        public void Update()
+        {
+            label.Text = $"Points: {points}, Time left: {lifetime}";
+        }
+    }
 }
