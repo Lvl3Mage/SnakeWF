@@ -17,13 +17,14 @@ namespace SnakeWF
         int height = 500;
         Snake snake;
 
-        public Form1() 
+        public Form1()
         {
             InitializeComponent();
             snake = new Snake((100, 100), this);
             GameLoop();
             // do later once the snake and segments have been written
         }
+
         async void GameLoop()
         {
             while (true)
@@ -65,6 +66,11 @@ namespace SnakeWF
             snake.RotateSnake(newDir);
             //Handle key presses and change the direction of the snake
         }
+
+        private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
     public class IntVec
     {
@@ -74,12 +80,12 @@ namespace SnakeWF
             x = _x;
             y = _y;
         }
-        public IntVec((int,int) tup)
+        public IntVec((int, int) tup)
         {
             x = tup.Item1;
             y = tup.Item2;
         }
-        public (int,int) ToTuple()
+        public (int, int) ToTuple()
         {
             return (x, y);
         }
@@ -94,7 +100,7 @@ namespace SnakeWF
         }
         public static IntVec operator +(IntVec self, IntVec other)
         {
-            return new IntVec(self.x+other.x, self.y+other.y);
+            return new IntVec(self.x + other.x, self.y + other.y);
         }
         public static IntVec operator -(IntVec self, IntVec other)
         {
@@ -104,7 +110,7 @@ namespace SnakeWF
         //Integer scaling
         public static IntVec operator *(IntVec self, int val)
         {
-            return new IntVec(self.x*val, self.y*val);
+            return new IntVec(self.x * val, self.y * val);
         }
         public static IntVec operator *(int val, IntVec self)
         {
@@ -116,7 +122,7 @@ namespace SnakeWF
             return new IntVec(self.x / val, self.y / val);
         }
     }
-    public class Snake 
+    public class Snake
     {
         Segment head;
         List<Segment> segments = new List<Segment>();
@@ -128,9 +134,9 @@ namespace SnakeWF
         int lifetime = 0;
 
         //May need additional data such as:
-            //The total snake length (in order to facilitate the snake update and point increment)
-        
-        public Snake((int,int) position, Form form)
+        //The total snake length (in order to facilitate the snake update and point increment)
+
+        public Snake((int, int) position, Form form)
         {
             attachedForm = form;
             //create the head
@@ -149,7 +155,7 @@ namespace SnakeWF
         {
             //calculates the movement distance and movement vector
             int delta = (int)(pixelsPerSecond * deltaTime);
-            IntVec movementVector = GetNormalVectorFromDir(head.direction)*delta;
+            IntVec movementVector = GetNormalVectorFromDir(head.direction) * delta;
 
             //moves the head segment in its direction
             IntVec newHeadPos = new IntVec(head.position) + movementVector;
@@ -157,7 +163,7 @@ namespace SnakeWF
 
 
             //updates the last segment to move to head with new length
-            Segment closestSegment = segments[segments.Count-1];
+            Segment closestSegment = segments[segments.Count - 1];
 
             IntVec newClosestSegPos = new IntVec(closestSegment.position) + movementVector;
 
@@ -165,15 +171,16 @@ namespace SnakeWF
 
 
             //sets the leftoverLength accounting for the accumulated length
-            int leftoverLength = Math.Max(delta-accumulatedLength, 0);
+            int leftoverLength = Math.Max(delta - accumulatedLength, 0);
 
             accumulatedLength = Math.Max(accumulatedLength - delta, 0);
-            
-            
+
+
 
 
             //subtracts from the last segment using leftover length (removing the segment if it hits 0 length) until the leftover length runs out
-            while (leftoverLength > 0) {
+            while (leftoverLength > 0)
+            {
                 if (segments[0].length > leftoverLength)
                 {
                     segments[0].UpdateSegment(segments[0].position, segments[0].length - leftoverLength, snakeWidth, segments[0].direction);
@@ -182,7 +189,7 @@ namespace SnakeWF
                 else // segment is shorter than leftover length
                 {
                     int removedLength = segments[0].length;
-                    if(segments.Count > 1)
+                    if (segments.Count > 1)
                     {
                         segments[0].RemoveSegment();
                         segments.RemoveAt(0);
@@ -209,9 +216,9 @@ namespace SnakeWF
 
             //rotate head
             //find the center position of the head
-            IntVec centerPos = new IntVec(head.position) - (GetNormalVectorFromDir(head.direction)*snakeWidth)/2;
+            IntVec centerPos = new IntVec(head.position) - (GetNormalVectorFromDir(head.direction) * snakeWidth) / 2;
             //update the head with the new offset in the new direction
-            head.UpdateSegment((centerPos + (GetNormalVectorFromDir(direction) * snakeWidth)/2).ToTuple(), head.length, snakeWidth, direction);
+            head.UpdateSegment((centerPos + (GetNormalVectorFromDir(direction) * snakeWidth) / 2).ToTuple(), head.length, snakeWidth, direction);
             AddSegmentAtHead();
         }
 
@@ -239,9 +246,9 @@ namespace SnakeWF
                 default: return new IntVec(0, 0);
             }
         }
-            
 
-            
+
+
         public bool checkInCollision()
         {
             foreach (Segment segment in segments)
@@ -262,21 +269,21 @@ namespace SnakeWF
         public int length { get; private set; }
         public (int, int) position { get; private set; }
         //Look into whether the intersections will be handled here or in the snake class
-        public PictureBox visual { get; private set;}
+        public PictureBox visual { get; private set; }
         Color color;
         Form attachedForm;
-        public Segment (Form form, (int, int) startPoint, int length, int width, Direction direction, Color color)
+        public Segment(Form form, (int, int) startPoint, int length, int width, Direction direction, Color color)
         {
             //create the visual and add it to form controls
-            visual = new PictureBox ();
+            visual = new PictureBox();
             visual.BackColor = color;
             attachedForm = form;
-            attachedForm.Controls.Add (visual);
+            attachedForm.Controls.Add(visual);
             UpdateSegment(startPoint, length, width, direction);
         }
 
         // update segment method that redraws the visual with new dimentions (from start point in the direction and with specified length)
-        public void UpdateSegment ((int, int) startPoint, int length, int width, Direction direction)
+        public void UpdateSegment((int, int) startPoint, int length, int width, Direction direction)
         {
             this.direction = direction;
             this.length = length;
@@ -318,12 +325,12 @@ namespace SnakeWF
                     break;
             }
         }
-        public void RemoveSegment ()
+        public void RemoveSegment()
         {
             attachedForm.Controls.Remove(visual);
         }
-        
-        public bool isSegmentCollisioningWith (Rectangle bounds)
+
+        public bool isSegmentCollisioningWith(Rectangle bounds)
         {
             return visual.Bounds.IntersectsWith(bounds);
         }
@@ -343,7 +350,7 @@ namespace SnakeWF
         Form attachedForm;
         int desiredFoodAmount = 4;
         (int, int) screenBounds;
-        public FoodManager(Snake _snake, Form _attachedForm, (int,int) _screenBounds)
+        public FoodManager(Snake _snake, Form _attachedForm, (int, int) _screenBounds)
         {
             snake = _snake;
             attachedForm = _attachedForm;
@@ -352,29 +359,29 @@ namespace SnakeWF
         public void Update(float deltaTime)
         {
             //if no food objects
-                //add a random amount of food objets
+            //add a random amount of food objets
             //for all food objs
-                // check collision with snake head (if colliding remove food and add the points to snake) (use snake.checkHeadCollision)
+            // check collision with snake head (if colliding remove food and add the points to snake) (use snake.checkHeadCollision)
         }
 
         //Maybe add some method to add random food to make it more readable
-            //(as far as I see it we shouldn't really care if the food spawns inside the snake, it won't happen often enough)
-             
-            
+        //(as far as I see it we shouldn't really care if the food spawns inside the snake, it won't happen often enough)
+
+        //A draw method that calls the draw method on every foodobj
     }
     public class Food //This class should be mostly set up but feel free to change it if you need to
     {
 
         public int points { get; private set; }
-        public int lifetime { get; private set; } 
+        public int lifetime { get; private set; }
         public PictureBox visual { get; private set; }
         Form attachedForm;
-        public Food((int,int) _position, int _points, int _lifetime, Color color, Form _attachedForm)
+        public Food((int, int) _position, int _points, int _lifetime, Color color, Form _attachedForm)
         {
             attachedForm = _attachedForm;
             points = _points;
             lifetime = _lifetime;
-            
+
             visual = new PictureBox();
             visual.Location = new Point(_position.Item1, _position.Item2);
             visual.BackColor = color;
