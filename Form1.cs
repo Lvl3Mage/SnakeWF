@@ -360,6 +360,7 @@ namespace SnakeWF
             snake = _snake;
             attachedForm = _attachedForm;
             screenBounds = _screenBounds;
+            Random r = new Random();
         }
         public void Update(float deltaTime)
         {
@@ -367,12 +368,61 @@ namespace SnakeWF
             //add a random amount of food objets
             //for all food objs
             // check collision with snake head (if colliding remove food and add the points to snake) (use snake.checkHeadCollision)
+            if (foodObjs.Count == 0)
+            {
+                int loop = r.Next(1, 4);
+                for(int i = 0; i < loop; i++)
+                {
+                    (int, int) randomFoodPosition = (r.Next(736), r.Next(501));
+                    int randomPoints = r.Next(2, 7);
+                    Color randomColor;
+                    switch (randomPoints)
+                    {
+                        case 2:
+                            randomColor = Color.Red;
+                            break;
+                        case 3:
+                            randomColor = Color.Blue;
+                            break;
+                        case 4:
+                            randomColor = Color.Green;
+                            break;
+                        case 5:
+                            randomColor = Color.Yellow;
+                            break;
+                        case 6:
+                            randomColor = Color.Purple;
+                            break;
+                        default:
+                            break;
+                    }
+                    int randomLifeTime = r.Next(10, 17);
+                    Food food = new Food(randomFoodPosition, randomPoints, randomLifeTime, randomColor, attachedForm);
+                    foodObjs.Add(food);
+                }
+            }
+            // sumar puntos
+            for(int i = 0; i < foodObjs.Count; i++)
+            {
+                if (snake.checkHeadCollision(foodObjs[i].visual.Bounds))
+                {
+                    foodObjs[i].Remove();
+                    foodObjs.RemoveAt(i);
+                }
+            }
         }
 
         //Maybe add some method to add random food to make it more readable
         //(as far as I see it we shouldn't really care if the food spawns inside the snake, it won't happen often enough)
 
         //A draw method that calls the draw method on every foodobj
+        public void DrawFood()
+        {
+            for(int i = 0; i < foodObjs.Count; i++)
+            {
+                foodObjs[i].Draw();
+            }
+        }
     }
     public class Food //This class should be mostly set up but feel free to change it if you need to
     {
